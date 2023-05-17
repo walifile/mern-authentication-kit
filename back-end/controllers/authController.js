@@ -7,32 +7,42 @@ const asyncHandler = require("express-async-handler");
 // @route POST /auth
 // @access Public
 const login = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { user, pwd } = req.body;
+  if (!user || !pwd)
+    return res
+      .status(400)
+      .json({ message: "Username and password are required." });
 
-  if (!username || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+  const foundUser = await User.findOne({ username: user }).exec();
 
-  const foundUser = await User.findOne({ username }).exec();
-
-  if (!foundUser || !foundUser.active) {
+  if (!foundUser) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const match = await bcrypt.compare(password, foundUser.password);
+  const match = await bcrypt.compare(pwd, foundUser.password);
 
   if (!match) return res.status(401).json({ message: "Unauthorized" });
-
+  const roles = Object.values(foundUser.roles).filter(Boolean);
   const accessToken = jwt.sign(
     {
       UserInfo: {
         username: foundUser.username,
-        roles: foundUser.roles,
+        roles: roles,
       },
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "15m" }
   );
+  // const accessToken = jwt.sign(
+  //   {
+  //     UserInfo: {
+  //       username: foundUser.username,
+  //       roles: foundUser.roles,
+  //     },
+  //   },
+  //   process.env.ACCESS_TOKEN_SECRET,
+  //   { expiresIn: "15m" }
+  // );
 
   const refreshToken = jwt.sign(
     { username: foundUser.username },
