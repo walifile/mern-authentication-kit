@@ -11,16 +11,16 @@ import LinkPage from "./components/LinkPage";
 import RequireAuth from "./components/RequireAuth";
 import { Routes, Route } from "react-router-dom";
 
-const ROLES = {
-  User: 2001,
-  Editor: 1984,
-  Admin: 5150,
-};
 // const ROLES = {
 //   User: 2001,
 //   Editor: 1984,
 //   Admin: 5150,
 // };
+const ROLES = {
+  User: "user",
+  Admin: "admin",
+  Editor: "admin",
+};
 
 function App() {
   return (
@@ -33,7 +33,9 @@ function App() {
         <Route path="unauthorized" element={<Unauthorized />} />
 
         {/* we want to protect these routes */}
-        <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+        <Route
+          element={<RequireAuth allowedRoles={[ROLES.User, ROLES.Admin]} />}
+        >
           <Route path="/" element={<Home />} />
         </Route>
 
