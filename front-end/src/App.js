@@ -19,7 +19,7 @@ import { Routes, Route } from "react-router-dom";
 const ROLES = {
   User: "user",
   Admin: "admin",
-  Editor: "admin",
+  Editor: "editor",
 };
 
 function App() {
